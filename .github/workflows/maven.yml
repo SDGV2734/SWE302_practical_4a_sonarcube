@@ -20,7 +20,13 @@ jobs:
           distribution: "temurin"
           cache: maven
       - name: Build and Test
-        run: mvn clean verify
+        run: |
+          mvn clean verify \
+            -s .m2/settings.xml \
+            -Dorg.slf4j.simpleLogger.defaultLogLevel=warn \
+            -Dmaven.wagon.http.retryHandler.class=standard \
+            -Dmaven.wagon.http.retryHandler.request.sent=true \
+            -Dmaven.wagon.http.retryHandler.count=3
 
   sonarcloud:
     name: SonarCloud Security Scan
@@ -46,10 +52,20 @@ jobs:
           restore-keys: ${{ runner.os }}-sonar
 
       - name: Build project first
-        run: mvn clean compile test-compile
+        run: |
+          mvn clean compile test-compile \
+            -s .m2/settings.xml \
+            -Dmaven.wagon.http.retryHandler.class=standard \
+            -Dmaven.wagon.http.retryHandler.request.sent=true \
+            -Dmaven.wagon.http.retryHandler.count=3
 
       - name: Run tests and generate coverage
-        run: mvn test jacoco:report
+        run: |
+          mvn test jacoco:report \
+            -s .m2/settings.xml \
+            -Dmaven.wagon.http.retryHandler.class=standard \
+            -Dmaven.wagon.http.retryHandler.request.sent=true \
+            -Dmaven.wagon.http.retryHandler.count=3
 
       - name: Run SonarCloud analysis
         env:
@@ -57,8 +73,12 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn sonar:sonar \
+            -s .m2/settings.xml \
             -Dsonar.projectKey=Kinley-pal8_cicd-demosk \
-            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }}
+            -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
+            -Dmaven.wagon.http.retryHandler.class=standard \
+            -Dmaven.wagon.http.retryHandler.request.sent=true \
+            -Dmaven.wagon.http.retryHandler.count=3
 
   security:
     needs: test
