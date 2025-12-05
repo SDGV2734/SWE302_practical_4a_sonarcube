@@ -19,16 +19,9 @@ jobs:
           java-version: "17"
           distribution: "temurin"
           cache: maven
-      - name: Verify settings.xml
-        run: |
-          echo "Checking settings.xml location:"
-          ls -la .m2/settings.xml
-          cat .m2/settings.xml
       - name: Build and Test
         run: |
           mvn clean verify \
-            -gs .m2/settings.xml \
-            -Dorg.slf4j.simpleLogger.defaultLogLevel=warn \
             -Dmaven.wagon.http.retryHandler.class=standard \
             -Dmaven.wagon.http.retryHandler.request.sent=true \
             -Dmaven.wagon.http.retryHandler.count=3
@@ -59,7 +52,6 @@ jobs:
       - name: Build project first
         run: |
           mvn clean compile test-compile \
-            -gs .m2/settings.xml \
             -Dmaven.wagon.http.retryHandler.class=standard \
             -Dmaven.wagon.http.retryHandler.request.sent=true \
             -Dmaven.wagon.http.retryHandler.count=3
@@ -67,7 +59,6 @@ jobs:
       - name: Run tests and generate coverage
         run: |
           mvn test jacoco:report \
-            -gs .m2/settings.xml \
             -Dmaven.wagon.http.retryHandler.class=standard \
             -Dmaven.wagon.http.retryHandler.request.sent=true \
             -Dmaven.wagon.http.retryHandler.count=3
@@ -78,7 +69,6 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           mvn sonar:sonar \
-            -gs .m2/settings.xml \
             -Dsonar.projectKey=Kinley-pal8_cicd-demosk \
             -Dsonar.organization=${{ secrets.SONAR_ORGANIZATION }} \
             -Dmaven.wagon.http.retryHandler.class=standard \
